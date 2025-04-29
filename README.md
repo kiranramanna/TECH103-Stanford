@@ -1,3 +1,5 @@
+# TECH103-Stanford
+
 # Miami Hotel Search Engine
 
 A semantic search engine for finding hotels in Miami based on user queries.
@@ -47,6 +49,9 @@ jupyter lab
   - Reviews and descriptions
 - Natural language query processing
 - Similarity scoring for search results
+- Real-time internet search integration using DuckDuckGo
+  - Latest news about hotels
+  - Recent reviews and information
 
 ### Data Source
 
@@ -58,4 +63,4 @@ Try searching with natural language queries like:
 - "luxury beachfront hotels with ocean view"
 - "family friendly hotels with swimming pools"
 - "spa resorts with yoga classes"
-- "affordable hotels near downtown Miami" 
+- "affordable hotels near downtown Miami"
