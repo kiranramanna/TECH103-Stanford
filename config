@@ -1,0 +1,19 @@
+Host code.devsnc.com
+    Port=37022
+    User=git
+    IdentityFile=/Users/kiran.ramanna/.ssh/id_rsa
+Host github.com
+    HostName github.com
+    User kiranramanna
+    IdentityFile=/Users/kiran.ramanna/.ssh/kirangmail
+# Host github.com
+#     HostName github.com
+#     User kiran-ramanna
+#     IdentityFile=/Users/kiran.ramanna/.ssh/id_rsa
+Host toolkit
+    HostName localhost
+    Port 2222
+    User toolkit
+    ForwardAgent yes
+    AddKeysToAgent yes
+    IdentityFile=/Users/kiran.ramanna/.ssh/id_rsa
