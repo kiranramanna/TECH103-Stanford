@@ -13,6 +13,10 @@ A semantic search engine for finding hotels in Miami based on user queries.
 └── requirements.txt   # Project dependencies
 ```
 
+## Quick Start
+
+You can view the main notebook here: [hotel_search.ipynb](notebooks/hotel_search.ipynb)
+
 ## Setup and Usage
 
 ### Environment Setup
