@@ -16,7 +16,7 @@ Stanford coursework projects and assignments.
 ### 004-module: Miami Hotel Search Engine
 A semantic search engine that processes natural language queries to find Miami hotels. Uses DuckDuckGo for real-time data integration.
 
-[Go to Module →](004-module/README.md)
+[Go to Module →](004-module)
 
 ## Structure
 ```
