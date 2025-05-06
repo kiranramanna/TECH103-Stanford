@@ -53,9 +53,11 @@ def timeit(func: Callable) -> Callable:
         result = func(*args, **kwargs)
         end_time = time.time()
         
-        # Log execution time
-        duration = end_time - start_time
-        logger.info(f"{func.__name__} took {duration:.2f} seconds")
+        # Log execution time with engine/class name if available
+        engine = ""
+        if args and hasattr(args[0], '__class__'):
+            engine = f"[{args[0].__class__.__name__}] "
+        logger.info(f"{engine}{func.__name__} took {end_time - start_time:.2f} seconds")
         
         return result
     return wrapper
