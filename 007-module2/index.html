@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Solar System</title>
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      background-color: black; 
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    
+    .container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    .left-panel {
+      width: 20%;
+      background-color: rgba(20, 20, 40, 0.8);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .center-panel {
+      width: 60%;
+      position: relative;
+    }
+    
+    .right-panel {
+      width: 20%;
+      background-color: rgba(20, 20, 40, 0.8);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .panel-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      text-align: center;
+      color: #88aaff;
+    }
+    
+    .date-time {
+      margin-bottom: 20px;
+    }
+    
+    .location-selector {
+      margin-bottom: 20px;
+    }
+    
+    .location-selector select {
+      width: 100%;
+      padding: 8px;
+      background-color: #27293d;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+    
+    .location-input {
+      width: 100%;
+      padding: 8px;
+      background-color: #27293d;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    
+    .pac-container {
+      background-color: #27293d;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 0 0 4px 4px;
+    }
+    
+    .pac-item {
+      color: #ddd;
+      padding: 6px;
+      cursor: pointer;
+    }
+    
+    .pac-item:hover, .pac-item-selected {
+      background-color: #373957;
+    }
+    
+    .pac-item-query {
+      color: white;
+    }
+    
+    .clock {
+      font-size: 24px;
+      text-align: center;
+      margin: 10px 0;
+    }
+    
+    .date {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .chat-messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      background-color: rgba(40, 40, 60, 0.5);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    
+    .message {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 15px;
+      max-width: 80%;
+    }
+    
+    .bot-message {
+      background-color: #2a406b;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
+    
+    .user-message {
+      background-color: #573b81;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+      margin-left: auto;
+    }
+    
+    .chat-input {
+      display: flex;
+    }
+    
+    .chat-input input {
+      flex-grow: 1;
+      padding: 8px;
+      border-radius: 20px;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin-right: 5px;
+    }
+    
+    .chat-input button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 20px;
+      background-color: #4d7bff;
+      color: white;
+      cursor: pointer;
+    }
+    
+    .chat-input button:hover {
+      background-color: #3a66e6;
+    }
+    
+    #info {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      z-index: 100;
+      display: block;
+      pointer-events: none;
+    }
+    
+    #controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: white;
+      background-color: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+    }
+    
+    #planet-info {
+      position: absolute;
+      top: 50px;
+      right: 10px;
+      color: white;
+      background-color: rgba(0,0,0,0.5);
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      width: 200px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .left-panel, .center-panel, .right-panel {
+        width: 100%;
+        height: auto;
+      }
+      .center-panel {
+        order: 1;
+        height: 60vh;
+      }
+      .left-panel {
+        order: 2;
+        height: 20vh;
+      }
+      .right-panel {
+        order: 3;
+        height: 20vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <div class="panel-title">Location & Time</div>
+      <div class="location-selector">
+        <label for="location-input">Enter Location:</label>
+        <input type="text" id="location-input" class="location-input" placeholder="Type a city name...">
+      </div>
+      <div class="date-time">
+        <div class="clock" id="clock">12:00:00</div>
+        <div class="date" id="date">May 23, 2025</div>
+      </div>
+      <div>
+        <p>Longitude: <span id="longitude">0.00</span>°</p>
+        <p>Latitude: <span id="latitude">0.00</span>°</p>
+        <p>Time Zone: <span id="timezone">UTC+0</span></p>
+      </div>
+    </div>
+    
+    <div class="center-panel">
+      <div id="info">3D Solar System Visualization</div>
+      <div id="controls">
+        Controls:<br>
+        - Click and drag to rotate<br>
+        - Scroll to zoom in/out<br>
+        - Right-click and drag to pan<br>
+        - Double-click to reset view
+      </div>
+      <div id="planet-info"></div>
+      <!-- 3D Solar System will be rendered here -->
+    </div>
+    
+    <div class="right-panel">
+      <div class="panel-title">Cosmos Chat</div>
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+          <div class="message bot-message">
+            Hello! I'm your space guide. Ask me anything about our solar system.
+          </div>
+        </div>
+        <div class="chat-input">
+          <input type="text" id="user-message" placeholder="Type your question...">
+          <button id="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <!-- Google Places API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places" async defer></script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { loadPlanetTextures } from './js/planet-textures.js';
+
+    // Location and time data
+    const locations = {
+      'new-york': { lat: 40.7128, lng: -74.0060, timezone: 'UTC-4' },
+      'tokyo': { lat: 35.6762, lng: 139.6503, timezone: 'UTC+9' },
+      'london': { lat: 51.5074, lng: -0.1278, timezone: 'UTC+1' },
+      'sydney': { lat: -33.8688, lng: 151.2093, timezone: 'UTC+10' },
+      'cape-town': { lat: -33.9249, lng: 18.4241, timezone: 'UTC+2' }
+    };
+
+    // Initialize Google Places Autocomplete
+    function initAutocomplete() {
+      const input = document.getElementById('location-input');
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['(cities)'],
+        fields: ['name', 'geometry', 'formatted_address']
+      });
+      
+      autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        
+        if (!place.geometry) {
+          // User entered the name of a place that was not suggested
+          return;
+        }
+        
+        // Get location data
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        
+        // Estimate timezone based on longitude (simplified)
+        const timezoneOffset = Math.round(lng / 15);
+        const timezoneStr = timezoneOffset >= 0 ? `UTC+${timezoneOffset}` : `UTC${timezoneOffset}`;
+        
+        // Update location info
+        document.getElementById('longitude').textContent = lng.toFixed(2);
+        document.getElementById('latitude').textContent = lat.toFixed(2);
+        document.getElementById('timezone').textContent = timezoneStr;
+      });
+    }
+    
+    // Initialize autocomplete when Google Maps API is loaded
+    if (typeof google !== 'undefined' && google.maps) {
+      initAutocomplete();
+    } else {
+      // Wait for Google Maps API to load
+      window.initGoogleMaps = initAutocomplete;
+      document.querySelector('script[src*="maps.googleapis"]').src = 
+        document.querySelector('script[src*="maps.googleapis"]').src.replace('async defer', 'async defer callback=initGoogleMaps');
+    }
+
+    // Initialize with default location
+    const defaultLocation = locations['new-york'];
+    document.getElementById('longitude').textContent = defaultLocation.lng.toFixed(2);
+    document.getElementById('latitude').textContent = defaultLocation.lat.toFixed(2);
+    document.getElementById('timezone').textContent = defaultLocation.timezone;
+    
+    // Set default value in input field
+    document.getElementById('location-input').value = 'New York';
+
+    // Clock update
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString();
+      const dateStr = now.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      document.getElementById('clock').textContent = timeStr;
+      document.getElementById('date').textContent = dateStr;
+    }
+
+    // Update the clock every second
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Chat functionality
+    document.getElementById('send-button').addEventListener('click', sendMessage);
+    document.getElementById('user-message').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    function sendMessage() {
+      const messageInput = document.getElementById('user-message');
+      const message = messageInput.value.trim();
+      
+      if (message) {
+        // Add user message to chat
+        addMessage(message, 'user');
+        messageInput.value = '';
+        
+        // Simulate bot response
+        setTimeout(() => {
+          const response = getBotResponse(message);
+          addMessage(response, 'bot');
+        }, 1000);
+      }
+    }
+
+    function addMessage(message, sender) {
+      const chatMessages = document.getElementById('chat-messages');
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('message');
+      messageElement.classList.add(sender + '-message');
+      messageElement.textContent = message;
+      
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function getBotResponse(message) {
+      // Simple response logic based on keywords
+      message = message.toLowerCase();
+      
+      if (message.includes('hello') || message.includes('hi')) {
+        return "Hello there! How can I help you with your cosmic questions?";
+      } else if (message.includes('earth')) {
+        return "Earth is the third planet from the Sun and the only astronomical object known to harbor life.";
+      } else if (message.includes('mars')) {
+        return "Mars is the fourth planet from the Sun and the second-smallest planet in our Solar System. It's often referred to as the 'Red Planet'.";
+      } else if (message.includes('jupiter')) {
+        return "Jupiter is the fifth planet from the Sun and the largest planet in our Solar System. It's a gas giant with a mass one-thousandth that of the Sun.";
+      } else if (message.includes('saturn')) {
+        return "Saturn is the sixth planet from the Sun and the second-largest in our Solar System. It's known for its prominent ring system.";
+      } else if (message.includes('mercury')) {
+        return "Mercury is the smallest and innermost planet in our Solar System. It completes an orbit around the Sun every 88 Earth days.";
+      } else if (message.includes('venus')) {
+        return "Venus is the second planet from the Sun. It's named after the Roman goddess of love and beauty. It's the hottest planet in our solar system.";
+      } else if (message.includes('uranus')) {
+        return "Uranus is the seventh planet from the Sun. It has the third-largest planetary radius and fourth-largest planetary mass in our Solar System.";
+      } else if (message.includes('neptune')) {
+        return "Neptune is the eighth and farthest-known planet from the Sun. It's the fourth-largest planet by diameter and the third-largest by mass.";
+      } else if (message.includes('sun')) {
+        return "The Sun is the star at the center of our Solar System. It's a nearly perfect sphere of hot plasma, with internal convective motion that generates a magnetic field.";
+      } else {
+        return "That's an interesting question about space! Is there something specific about our solar system you'd like to know?";
+      }
+    }
+
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth * 0.6 / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 20, 40);
+
+    // Renderer setup
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth * 0.6, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.querySelector('.center-panel').appendChild(renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0x555555);
+    scene.add(ambientLight);
+    
+    const pointLight = new THREE.PointLight(0xffffff, 5, 100);
+    scene.add(pointLight);
+
+    // Texture loader
+    const textureLoader = new THREE.TextureLoader();
+    const textureManager = loadPlanetTextures(textureLoader);
+
+    // Stars background
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsCount = 5000;
+    const starsPositions = new Float32Array(starsCount * 3);
+    
+    for (let i = 0; i < starsCount * 3; i += 3) {
+      starsPositions[i] = (Math.random() - 0.5) * 2000;
+      starsPositions[i+1] = (Math.random() - 0.5) * 2000;
+      starsPositions[i+2] = (Math.random() - 0.5) * 2000;
+    }
+    
+    starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+    const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(stars);
+
+    // Sun with glow effect
+    const sunGeometry = new THREE.SphereGeometry(3, 32, 32);
+    const sunMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0xffff00,
+    });
+    const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    scene.add(sun);
+
+    // Add a stronger glow effect to the sun
+    const sunGlowGeometry = new THREE.SphereGeometry(3.8, 32, 32);
+    const sunGlowMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0xffff99,
+      transparent: true,
+      opacity: 0.4
+    });
+    const sunGlow = new THREE.Mesh(sunGlowGeometry, sunGlowMaterial);
+    scene.add(sunGlow);
+
+    // Planet definitions: [distance, radius, color, orbital speed, inclination, name]
+    const planets = [
+      [5, 0.4, 0xcccccc, 0.008, 0.03, "Mercury"],
+      [7, 0.6, 0xffeeaa, 0.006, 0.02, "Venus"],
+      [10, 0.65, 0x66aaff, 0.004, 0, "Earth"],
+      [13, 0.5, 0xff6633, 0.003, 0.01, "Mars"],
+      [20, 1.5, 0xffdd99, 0.002, 0.005, "Jupiter"],
+      [26, 1.2, 0xffcc99, 0.0015, 0.007, "Saturn"],
+      [32, 0.9, 0xaaddff, 0.001, 0.01, "Uranus"],
+      [36, 0.85, 0x6699ff, 0.0008, 0.015, "Neptune"]
+    ];
+
+    // Function to create orbit lines
+    function createOrbit(radius, inclination = 0) {
+      const points = [];
+      const segments = 128;
+      
+      for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * Math.PI * 2;
+        const x = Math.cos(theta) * radius;
+        const y = Math.sin(theta) * Math.sin(inclination) * radius;
+        const z = Math.sin(theta) * Math.cos(inclination) * radius;
+        points.push(new THREE.Vector3(x, y, z));
+      }
+      
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      const material = new THREE.LineBasicMaterial({ 
+        color: 0x444444, 
+        transparent: true, 
+        opacity: 0.3 
+      });
+      
+      return new THREE.Line(geometry, material);
+    }
+
+    // Create planets and their orbits
+    const planetObjects = [];
+    planets.forEach(([distance, radius, color, speed, inclination, name]) => {
+      // Add orbit
+      const orbit = createOrbit(distance, inclination);
+      scene.add(orbit);
+      
+      // Create planet
+      const geometry = new THREE.SphereGeometry(radius, 24, 24);
+      const material = new THREE.MeshStandardMaterial({ 
+        color: color,
+        roughness: 0.5,
+        metalness: 0.2,
+        emissive: color,
+        emissiveIntensity: 0.2
+      });
+      
+      const planet = new THREE.Mesh(geometry, material);
+      planet.userData = { 
+        distance: distance, 
+        speed: speed, 
+        inclination: inclination,
+        name: name
+      };
+      
+      scene.add(planet);
+      planetObjects.push(planet);
+      
+      // Apply Earth texture
+      if (name === "Earth" && textureManager.textures.earth) {
+        textureManager.applyTextureToPlanet(planet, "earth");
+      }
+
+      // Create planet label with initial
+      const initial = name.charAt(0);
+      const labelCanvas = document.createElement('canvas');
+      const labelSize = 64;
+      labelCanvas.width = labelSize;
+      labelCanvas.height = labelSize;
+      const ctx = labelCanvas.getContext('2d');
+      ctx.font = `bold ${labelSize/2}px Arial`;
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(initial, labelSize/2, labelSize/2);
+
+      const labelTexture = new THREE.CanvasTexture(labelCanvas);
+      const labelMaterial = new THREE.SpriteMaterial({ 
+        map: labelTexture,
+        transparent: true
+      });
+      const label = new THREE.Sprite(labelMaterial);
+      label.position.y = radius * 2; // Position above the planet
+      label.scale.set(2, 2, 1);
+      planet.add(label);
+    });
+
+    // Add Saturn's rings
+    const saturnIndex = 5; // The index of Saturn in our planets array
+    const saturnPlanet = planetObjects[saturnIndex];
+    
+    const ringGeometry = new THREE.RingGeometry(1.3, 2.0, 64);
+    const ringMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0xf9d9ad,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.8
+    });
+    
+    const rings = new THREE.Mesh(ringGeometry, ringMaterial);
+    rings.rotation.x = Math.PI / 2;
+    saturnPlanet.add(rings);
+
+    // Controls setup
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.minDistance = 5;
+    controls.maxDistance = 100;
+
+    // Raycaster for planet selection
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let selectedPlanet = null;
+
+    // Mouse move event for planet selection
+    function onMouseMove(event) {
+      // Calculate mouse position in normalized device coordinates
+      // We need to adjust for the center panel's position
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    }
+    
+    renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+
+    // Planet info display
+    const planetInfo = document.getElementById('planet-info');
+    
+    // Display planet information
+    function showPlanetInfo(planet) {
+      if (!planet) {
+        planetInfo.innerHTML = '';
+        return;
+      }
+      
+      const { name, distance, speed } = planet.userData;
+      const orbitPeriod = (2 * Math.PI) / (speed * 10); // In animation time units
+      
+      planetInfo.innerHTML = `
+        <strong>${name}</strong><br>
+        Distance from Sun: ${distance.toFixed(1)} units<br>
+        Orbit Period: ${orbitPeriod.toFixed(1)} time units<br>
+        Radius: ${planet.geometry.parameters.radius.toFixed(2)} units
+      `;
+    }
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const time = Date.now() * 0.0001;
+      
+      // Update planet positions
+      planetObjects.forEach(planet => {
+        const { distance, speed, inclination } = planet.userData;
+        const angle = time * speed * 10; // Scale time for faster animation
+        
+        planet.position.x = Math.cos(angle) * distance;
+        planet.position.y = Math.sin(angle) * Math.sin(inclination) * distance;
+        planet.position.z = Math.sin(angle) * Math.cos(inclination) * distance;
+        
+        // Planet rotation
+        planet.rotation.y += 0.01;
+      });
+      
+      // Rotate the sun
+      sun.rotation.y += 0.001;
+      sunGlow.rotation.y += 0.001;
+      
+      // Check for planet selection
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(planetObjects);
+      
+      if (intersects.length > 0) {
+        if (selectedPlanet !== intersects[0].object) {
+          selectedPlanet = intersects[0].object;
+          showPlanetInfo(selectedPlanet);
+        }
+      } else if (selectedPlanet) {
+        selectedPlanet = null;
+        showPlanetInfo(null);
+      }
+      
+      // Update controls
+      controls.update();
+      
+      // Render scene
+      renderer.render(scene, camera);
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      // Update camera
+      camera.aspect = (window.innerWidth * 0.6) / window.innerHeight;
+      camera.updateProjectionMatrix();
+      
+      // Update renderer
+      renderer.setSize(window.innerWidth * 0.6, window.innerHeight);
+    });
+    
+    // Start animation
+    animate();
+  </script>
+</body>
+</html> 
